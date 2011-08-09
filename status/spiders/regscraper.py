@@ -12,8 +12,8 @@ DEBUG = 1
  activate by > scrapy crawl http://a841-dotvweb01.nyc.gov/ParkingRegs/ViewController/LocationValidation.aspx --set FEED_URI=scraped_data.json --set FEED_FORMAT=json
 
 """
-class StatusSpider(BaseSpider):
-   name = "Boo Ya"
+class RegulationsSpider(BaseSpider):
+   name = "regscrape"
    allowed_domains = ["nyc.gov"]
    start_urls = [
                 "http://a841-dotvweb01.nyc.gov/ParkingRegs/ViewController/LocationValidation.aspx"
@@ -131,7 +131,7 @@ class StatusSpider(BaseSpider):
 
    def parse(self, response):
       viewstate = self.get_viewstate(response)
-      self.logger.info( "Searching for regulations around %s", self.on_street)
+      log.msg( "Searching for regulations around %s" % self.on_street)
 
       formdata = { 'ddlOnBoro': 3, '__VIEWSTATE' : viewstate }
       return [FormRequest.from_response(response,
