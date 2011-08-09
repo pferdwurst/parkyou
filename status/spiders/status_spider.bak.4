@@ -1,0 +1,62 @@
+from scrapy.spider import BaseSpider
+from scrapy.selector import HtmlXPathSelector
+from scrapy.http import FormRequest
+
+from status.items import StatusItem
+
+DEBUG = 0
+
+class StatusSpider(BaseSpider):
+   name = "Boo Ya"
+   allowed_domains = ["nyc.gov"]
+   start_urls = [
+                "http://a841-dotvweb01.nyc.gov/ParkingRegs/ViewController/LocationValidation.aspx"
+    ]
+
+   form_data = { 'ddlOnBoro': 3 }
+   on_street = "ATLANTIC AVENUE"
+
+   def get_viewstate(self, response):
+      hxs = HtmlXPathSelector(response)
+      vs = hxs.select('//form/input[@name="__VIEWSTATE"]/@value').extract()
+      if DEBUG: print "Current view state %s" % vs
+      return vs
+
+
+   def select_boro(self, response):
+      viewstate = self.get_viewstate(response)
+
+      form_data = { 'ddlOnBoro': 3, '__VIEWSTATE' : viewstate }
+      return [FormRequest.from_response(response,
+	                    formdata=form_data, clickdata = {"name":"Button7"},
+	                    callback=self.select_street)]
+	
+	
+   def select_street(self, response):
+      viewstate = self.get_viewstate(response)
+
+      form_data = { 'ddlOnBoro': 3, 'iddOnstreet:txTextBox':self.on_street, '__VIEWSTATE' : viewstate }
+      return [FormRequest.from_response(response,
+	                    formdata=form_data, clickdata = {"name":"Button6"},
+	                    callback=self.select_crossstreet1)]
+
+
+   def select_crossstreet1(self, response):
+      viewstate = self.get_viewstate(response)
+      hxs = HtmlXPathSelector(response)
+      from_streets = hxs.select('//select[@name = "iddFromstreet:ddlDropDown"]/option/text()').extract()
+      print "Found %d cross streets for %s" % (len(from_streets), self.on_street)
+      print hxs
+      for street in from_streets:
+         print "(from streets) %s" % street
+
+
+   def parse(self, response):
+      viewstate = self.get_viewstate(response)
+      print "Searching for regulations around %s" % self.on_street
+
+      form_data = { 'ddlOnBoro': 3, '__VIEWSTATE' : viewstate }
+      return [FormRequest.from_response(response,
+	                    formdata=form_data, clickdata = {"name":"Button7"},
+                        callback=self.select_boro)]
+#	                    callback=lambda r: self.select_boro(r, viewstate))]
