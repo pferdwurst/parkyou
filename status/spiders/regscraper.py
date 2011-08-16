@@ -1,19 +1,20 @@
-from scrapy.spider import BaseSpider
-from scrapy.selector import HtmlXPathSelector
+
 from scrapy.http import FormRequest
 
-import logging
 
 from status.items import StatusItem
 from scrapy import log
+from statusspider import StatusSpider
+
+from scrapy.selector import HtmlXPathSelector
 
 DEBUG = 1
 """
  activate by > scrapy crawl http://a841-dotvweb01.nyc.gov/ParkingRegs/ViewController/LocationValidation.aspx --set FEED_URI=scraped_data.json --set FEED_FORMAT=json
 
 """
-class RegulationsSpider(BaseSpider):
-   name = "regscrape"
+class RegulationsSpider(StatusSpider):
+   name = "regscraper"
    allowed_domains = ["nyc.gov"]
    start_urls = [
                 "http://a841-dotvweb01.nyc.gov/ParkingRegs/ViewController/LocationValidation.aspx"
@@ -21,39 +22,12 @@ class RegulationsSpider(BaseSpider):
 
    on_street = "POPLAR STREET"
 
-   logger = logging.getLogger("statusSpider")
-   fileLogger = logging.FileHandler("parkyou.log")
-   fileLogger.setLevel(logging.DEBUG)
-   logger.addHandler(fileLogger)
 
-   streamer = logging.StreamHandler()
-   streamer.setLevel(logging.INFO)
-   logger.addHandler(streamer)
-
-   def log_response(self, response, step_no):
-        # body 
-        calling_fcn =  inspect.stack()[1][3]
-        f = open(self.out_dir + "/body_" + calling_fcn + "_" +  str(self.file_no) + ".html", mode="w")
-        f.write(response.body)
-        f.close
-
-   def get_viewstate(self, response):
-      hxs = HtmlXPathSelector(response)
-      vs = hxs.select('//form/input[@name="__VIEWSTATE"]/@value').extract()
-      return vs
-
-   def set_viewstate(self, response, formdata):
-      """Extract the viewstate from the response and store it in the formdata"""
-      hxs = HtmlXPathSelector(response)
-      vs = hxs.select('//form/input[@name="__VIEWSTATE"]/@value').extract() 
-      formdata['__VIEWSTATE']  = vs
-
-      return hxs
-
+       #calling_fcn =  inspect.stack()[1][3]
+        
    def select_boro(self, response):
-      viewstate = self.get_viewstate(response)
-
-      formdata = { 'ddlOnBoro': 3, '__VIEWSTATE' : viewstate }
+      formdata = { 'ddlOnBoro': 3}
+      self.set_viewstate(response, formdata)
       return [FormRequest.from_response(response,
                         formdata=formdata, clickdata = {"name":"Button7"},
                         callback=self.select_street)]
@@ -130,18 +104,15 @@ class RegulationsSpider(BaseSpider):
 
 
    def parse(self, response):
-      viewstate = self.get_viewstate(response)
       log.msg( "Searching for regulations around %s" % self.on_street)
 
-      formdata = { 'ddlOnBoro': 3, '__VIEWSTATE' : viewstate }
+      formdata = { 'ddlOnBoro': 3}
+      self.set_viewstate(response, formdata)
       return [FormRequest.from_response(response,
                         formdata=formdata, clickdata = {"name":"Button7"},
                         callback=self.select_boro)]
-#                       callback=lambda r: self.select_boro(r, viewstate))]
 
-   def __init__(self, start_street = "POPLAR STREET"):
-      self.on_street = start_street
-
+ 
 def main():
 	spider = StatusSpider("POPLAR STREET")
 
