@@ -16,7 +16,6 @@ import unittest
 
 from scrapy import log, signals, project
 #from scrapy.xlib.pydispatch import dispatcher
-
 from scrapy.conf import settings
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import inside_project
@@ -24,8 +23,8 @@ from scrapy.utils.misc import walk_modules
 from scrapy.command import ScrapyCommand
 import scrapy.commands.crawl
 
-
-#from multiprocessing import Process, Queue
+from multiprocessing import Process
+from scrapy.xlib.pydispatch import dispatcher
 
 
 
@@ -35,22 +34,25 @@ class TestSpider(unittest.TestCase):
         crawler = CrawlerProcess(settings)
         crawler.install()
         # what does this do?
-        inproject = inside_project()
+        inside_project()
+        self.items = []
 
         self.crawl_cmd = scrapy.commands.crawl.Command() 
-
         self.crawl_cmd.set_crawler(crawler)
-        self.parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), \
-            conflict_handler='resolve')
+
+        self.parser = optparse.OptionParser()
         self.crawl_cmd.add_options(self.parser)
+        dispatcher.connect(self._item_passed, signals.item_passed)
 
-        #self.crawler.configure()
-        #self.items = []
-        #dispatcher.connect(self._item_passed, signals.item_passed)
- 
+    def _item_passed(self, item):
+       self.items.append(item)
 
-
-        
+    def _doCrawl(self, spider_name, **kwargs):
+       opts, args = self.parser.parse_args([spider_name]) 
+       opts.spargs = ["on_street=POPLAR STREET"]
+       self.crawl_cmd.process_options(args, opts)
+       self.crawl_cmd.run(args, opts)
+    '''    
     def _crawl(self, queue, spider_name):
         spider = self.crawler.spiders.create(spider_name)
         if spider:
@@ -65,11 +67,13 @@ class TestSpider(unittest.TestCase):
         p.start()
         p.join()
         return queue.get(True)
+   '''
 
     def test_crawl(self):
-       opts, args = self.parser.parse_args(['regscraper']) 
-       self.crawl_cmd.process_options(args, opts)
-       self.crawl_cmd.run(args, opts)
+        ### Figure out how to pass the spider kwargs to the doCrawl method
+        self._doCrawl('regscraper')
+        print "This many items were collected %d" % len(self.items)
+        self.assertEqual(len(self.items), 6)
 
 # Usage
 if __name__ == "__main__":

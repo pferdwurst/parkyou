@@ -20,8 +20,6 @@ class RegulationsSpider(StatusSpider):
                 "http://a841-dotvweb01.nyc.gov/ParkingRegs/ViewController/LocationValidation.aspx"
     ]
 
-   on_street = "POPLAR STREET"
-
 
        #calling_fcn =  inspect.stack()[1][3]
         
@@ -112,9 +110,3 @@ class RegulationsSpider(StatusSpider):
                         formdata=formdata, clickdata = {"name":"Button7"},
                         callback=self.select_boro)]
 
- 
-def main():
-	spider = StatusSpider("POPLAR STREET")
-
-if __name__ == '__main__':
-	main()

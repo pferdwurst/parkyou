@@ -13,9 +13,9 @@ class StatusSpider(BaseSpider):
         'http://www.nyc.gov/',
         )
 
-    def __init__(self, start_street = "POPLAR STREET"):
-        self.on_street = start_street
-        self.logger = self.setupLogging()
+    def __init__(self, name=None, **kwargs):
+       BaseSpider.__init__(self, name, **kwargs)
+       self.logger = self.setupLogging()
  
     def parse(self, response):
         pass 
