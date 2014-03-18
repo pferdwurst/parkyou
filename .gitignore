@@ -2,3 +2,5 @@ log/
 .DS_Store
 # IDE artifacts
 .project
+*.pyc
+venv/

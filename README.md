@@ -1,4 +1,9 @@
-parkyou
-=======
+# ParkYou
 
-The ultimate parking app.
+NYC parking made less sucky.
+
+## Installation
+
+	See INSTALL.md    
+
+## Usage
