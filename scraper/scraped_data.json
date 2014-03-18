@@ -1,0 +1,6 @@
+[{"regulation": ["S-941350"], "onStreet": "POPLAR STREET", "side": "South", "toStreet": "HICKS STREET", "fromStreet": "WILLOW STREET"},
+{"regulation": ["S-999698"], "onStreet": "POPLAR STREET", "side": "North", "toStreet": "HENRY STREET", "fromStreet": "HICKS STREET"},
+{"regulation": ["S-999699"], "onStreet": "POPLAR STREET", "side": "South", "toStreet": "HENRY STREET", "fromStreet": "HICKS STREET"},
+{"regulation": ["S-941350"], "onStreet": "POPLAR STREET", "side": "South", "toStreet": "HICKS STREET", "fromStreet": "WILLOW STREET"},
+{"regulation": ["S-999698"], "onStreet": "POPLAR STREET", "side": "North", "toStreet": "HENRY STREET", "fromStreet": "HICKS STREET"},
+{"regulation": ["S-999699"], "onStreet": "POPLAR STREET", "side": "South", "toStreet": "HENRY STREET", "fromStreet": "HICKS STREET"}]
