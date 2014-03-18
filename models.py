@@ -47,5 +47,11 @@ class Feature(db.Document):
 
     def __unicode__(self):
         return self.sg_order_n
-
+    
+    def latitude(self):
+        return self.point["coordinates"][1]
+    
+    def longnitude(self):
+        return self.point["coordinates"][0]
+    
 
