@@ -4,3 +4,5 @@ log/
 .project
 *.pyc
 venv/
+conf/
+.pydevproject
