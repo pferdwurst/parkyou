@@ -18,9 +18,8 @@
 
         <script type="text/javascript"  src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&sensor=false"></script>
 
-        <!--
-            <script type="text/javascript" src=" {{ js }}" ></script>
-        -->
+        <script type="text/javascript" src=" {{ js }}" ></script>
+        
         <script type="text/javascript" >
             var center = new google.maps.LatLng( {{ LAT }}, {{ LONG }} );
 
@@ -31,29 +30,45 @@
                 var mapOptions = {
                     zoom : {{ ZOOM }},
                     center : center,
-                    mapTypeId : google.maps.MapTypeId.TERRAIN
+                    mapTypeId : google.maps.MapTypeId.ROADMAP
                 };
 
                 var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+                
+                
+
 
                 {% for reg in regulations %}
                     var path = [];
 
 
                      {% for sign in reg %}
-                        path.push(new google.maps.LatLng(   "{{ sign.latitude() }}" , "{{ sign.longnitude() }}" ));
+                        var latlng = new google.maps.LatLng(   "{{ sign.latitude() }}" , "{{ sign.longnitude() }}" );
+                        path.push(latlng);
+                        var marker = new google.maps.Marker({
+                                 position: latlng,
+                                 map: map,
+                                 title: " {{ sign.sg_order_n }}"
+                        });
+                        
+                        google.maps.event.addListener(marker, 'mouseover', function (event) {
+                            var infowindow = new google.maps.InfoWindow({
+                                 content: decorateInfoWindow( "{{ sign.sg_order_n }}", "{{ sign.desc }}")
+                            });
+                            infowindow.open(map, this);
+                         });
                         
                      {% endfor %}
 
                     var polypath = new google.maps.Polyline({
                         path : path,
-                        geodesic : true,
-                        strokeColor : "#ff000",
+                        strokeColor : "#585896",
                         strokeOpacity : 4.0,
                         strokeWeight : 4
                     });
                     polypath.setMap(map);
             
+                  
                 
                {% endfor %}
 

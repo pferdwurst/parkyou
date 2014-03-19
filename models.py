@@ -35,15 +35,15 @@ from parkyou import db
 
 class Feature(db.Document):
     created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
-    objectid = db.LongField()
+    object_id = db.LongField(required=True, unique=True)
     sg_order_n = db.StringField(max_length=255, required=True)
     borough = db.StringField(required=True)
-    desc = db.StringField(required = True)
+    desc = db.StringField(required=True)
     side = db.StringField()
     on_street = db.StringField()
     to_street = db.StringField()
     from_street = db.StringField()
-    point = db.PointField(required = True)
+    point = db.PointField(required=True, unique_with='object_id')
 
     def __unicode__(self):
         return self.sg_order_n
@@ -55,3 +55,10 @@ class Feature(db.Document):
         return self.point["coordinates"][0]
     
 
+    meta = {
+        'indexes': [ [ ("point", "2dsphere") ]],
+        'index_options': {},
+        'index_background': True,
+        'index_drop_dups': True,
+        'index_cls': False
+    }
