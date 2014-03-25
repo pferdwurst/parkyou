@@ -24,11 +24,11 @@ import json
 # The center of the map will be Times Square
 TS_LATITUDE = 40.759060
 TS_LONGNITUDE = -73.984776
-RADIUS = 1 # not sure what the unit on this is 
+RADIUS = 1  # not sure what the unit on this is 
 
 def get_polylines():
      polylines = []
-     regs = dbops.find_all_regulations((TS_LONGNITUDE ,  TS_LATITUDE), RADIUS)
+     regs = dbops.find_all_regulations((TS_LONGNITUDE , TS_LATITUDE), RADIUS)
      for reg in regs:
          signs = dbops.find_signs_for_regulation(reg.sg_order_n)
          polylines.append(signs)
@@ -55,9 +55,12 @@ def index():
 @nocache
 def show_map():
     regs = get_polylines()
-    zoom = 17
+    zoom = 16
     print "Found %d lines " % len(regs)
-    return render_template("nyc.html", API_KEY = app.config["GOOGLE_MAP_KEY"], LAT = TS_LATITUDE, LONG = TS_LONGNITUDE, ZOOM = zoom, js = url_for('static', filename='polyline.js'), regulations = regs )
+    return render_template("nyc.html", API_KEY=app.config["GOOGLE_MAP_KEY"],
+                            LAT=TS_LATITUDE, 
+                            LONG=TS_LONGNITUDE, ZOOM=zoom,  
+                            regulations=regs)
 
 
 if __name__ == '__main__':

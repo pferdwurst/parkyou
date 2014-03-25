@@ -40,4 +40,10 @@ pip install pyshp
   
   
 
-7. `$ python manage.py runserver`
+7.
+ `$ python manage.py runserver`  
+ 
+ 	OR 
+ 
+  `export PARKYOU_SETTINGS='conf/settings.cfg'; python manage.py runserver`
+  
